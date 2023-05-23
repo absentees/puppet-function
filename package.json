@@ -2,5 +2,9 @@
   "name": "puppet-function",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@sparticuz/chromium": "92.0.0",
+    "puppeteer-core": "^10.1.0"
+  }
 }
