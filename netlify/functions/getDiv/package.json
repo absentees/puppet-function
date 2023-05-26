@@ -1,0 +1,10 @@
+{
+  "name": "getDiv",
+  "version": "1.0.0",
+  "main": "getDiv.js",
+  "license": "MIT",
+  "dependencies": {
+    "@sparticuz/chromium": "92.0.0",
+    "puppeteer-core": "^10.1.0"
+  }
+}
