@@ -3,8 +3,8 @@ const chromium = require("@sparticuz/chromium");
 
 export const handler = async (event, context) => {
   // Extract event.body into an object
-  const { url, selector } = JSON.parse(event.body);
-  console.log(`Looking for ${selector} in ${url}`);
+  // const { url, selector } = JSON.parse(event.body);
+  // console.log(`Looking for ${selector} in ${url}`);
   let value = null;
 
   const browser = await puppeteer.launch({
@@ -17,8 +17,8 @@ export const handler = async (event, context) => {
 
   try {
     const page = await browser.newPage();
-    await page.goto(url);
-    await page.waitForSelector(selector);
+    await page.goto("https://apple.com");
+    await page.waitForSelector("h1");
     value = await page.$eval(selector, el => el.innerText);
     await browser.close();
 
