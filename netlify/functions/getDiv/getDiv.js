@@ -1,32 +1,35 @@
 const puppeteer = require("puppeteer-core");
 const chromium = require("@sparticuz/chromium");
+const dotenv = require("dotenv").config();
 
-export const handler = async (event, context) => {
+exports.handler = async (event, context) => {
   // Extract event.body into an object
   // const { url, selector } = JSON.parse(event.body);
   // console.log(`Looking for ${selector} in ${url}`);
-  let value = null;
+  // let value = null;
 
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
     executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath,
-    headless: chromium.true,
+    headless: 'new',
     ignoreHTTPSErrors: true,
   });
 
+  const page = await browser.newPage();
+
   try {
-    const page = await browser.newPage();
+    
     await page.goto("https://apple.com");
-    await page.waitForSelector("h1");
-    value = await page.$eval(selector, el => el.innerText);
+    // await page.waitForSelector("h1");
+    let value = await page.$eval("h1", (el) => el.innerText);
     await browser.close();
 
     // Return the value
     return {
       statusCode: 200,
       body: JSON.stringify({
-        value,
+        value
       })
     }
 
