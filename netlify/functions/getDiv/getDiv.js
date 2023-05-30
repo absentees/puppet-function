@@ -12,17 +12,29 @@ exports.handler = async (event, context) => {
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
     executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath,
-    headless: 'new',
+    headless: chromium.true,
     ignoreHTTPSErrors: true,
   });
 
   const page = await browser.newPage();
 
+  const getElement = async (ele) => {
+    try {
+      return await page.$eval(ele, (el) => el.innerText);
+    } catch (error) {
+      console.log(error);
+      return ele = null;
+    }
+  }
+
+
   try {
-    
-    await page.goto("https://apple.com");
+
+    await page.goto('https://apple.com');
     // await page.waitForSelector("h1");
-    let value = await page.$eval("h1", (el) => el.innerText);
+    let value = await getElement("h1");
+
+    // let value = await page.$eval("h1", (el) => el.innerText);
     await browser.close();
 
     // Return the value
