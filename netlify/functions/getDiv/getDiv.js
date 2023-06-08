@@ -3,45 +3,41 @@ const chromium = require("@sparticuz/chromium");
 const dotenv = require("dotenv").config();
 
 exports.handler = async (event, context) => {
-  // Extract event.body into an object
-  // const { url, selector } = JSON.parse(event.body);
-  // console.log(`Looking for ${selector} in ${url}`);
-  // let value = null;
+
+  // Optional: If you'd like to use the legacy headless mode. "new" is the default.
+  chromium.setHeadlessMode = "new";
 
   const browser = await puppeteer.launch({
-    args: chromium.args,
+    args: process.env.IS_LOCAL ? puppeteer.defaultArgs() : chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath,
-    headless: chromium.true,
-    ignoreHTTPSErrors: true,
+    executablePath: process.env.IS_LOCAL
+      ? "/tmp/localChromium/chromium/mac_arm-1154837/chrome-mac/Chromium.app/Contents/MacOS/Chromium"
+      : await chromium.executablePath(),
+    headless: process.env.IS_LOCAL ? false : chromium.headless
   });
 
-  const page = await browser.newPage();
 
-  const getElement = async (ele) => {
-    try {
-      return await page.$eval(ele, (el) => el.innerText);
-    } catch (error) {
-      console.log(error);
-      return ele = null;
-    }
-  }
-
+ 
 
   try {
+    let page = await browser.newPage();
 
-    await page.goto('https://apple.com');
-    // await page.waitForSelector("h1");
-    let value = await getElement("h1");
+    await page.goto('https://www.jbhifi.com.au/products/logitech-mx-master-3s-performance-wireless-mouse-graphite', {
+      waitUntil: 'networkidle0',
+    });
+    
+    // Get the h1 on the page
+    const title = await page.evaluate(() => {
+      return document.querySelector('#pdp-price-cta > div:nth-child(1) > div:nth-child(1) > div:nth-child(1) > span:nth-child(2)').innerText;
+    });
 
-    // let value = await page.$eval("h1", (el) => el.innerText);
     await browser.close();
 
     // Return the value
     return {
       statusCode: 200,
       body: JSON.stringify({
-        value
+        message: title
       })
     }
 
@@ -53,7 +49,7 @@ exports.handler = async (event, context) => {
 
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed' }),
+      body: JSON.stringify({ error: 'Failed' })
     }
   }
 
